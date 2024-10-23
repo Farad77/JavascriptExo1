@@ -1,5 +1,4 @@
-<!-- inscription.html -->
-<!DOCTYPE html>
+!DOCTYPE html>
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
@@ -14,8 +13,14 @@
         }
         
         body {
-            background-color: #ffffff;
+            background-image: url('expernet-1-e1679673101238.webp');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
             font-family: 'Roboto', Arial, sans-serif;
+            min-height: 100vh;
+            perspective: 1000px;
+            overflow-x: hidden;
         }
         
         .top-bar {
@@ -23,6 +28,8 @@
             color: white;
             padding: 0.5rem 0;
             font-size: 0.9rem;
+            position: relative;
+            z-index: 2;
         }
 
         .top-bar a {
@@ -34,34 +41,58 @@
             background-color: white;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
             padding: 1rem 0;
+            position: relative;
+            z-index: 2;
         }
         
         .registration-container {
             max-width: 600px;
             margin: 50px auto;
             padding: 30px;
-            background-color: white;
+            background-color: rgba(255, 255, 255, 0.95);
             border-radius: 10px;
             box-shadow: 0 0 20px rgba(0,0,0,0.1);
+            transform-style: preserve-3d;
+            transition: transform 0.2s ease-out;
+            position: relative;
+            z-index: 1;
+        }
+
+        .registration-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 10px;
+            z-index: -1;
         }
 
         h2 {
             color: var(--primary-color);
             font-weight: 600;
+            transform: translateZ(50px);
         }
 
         .form-label {
             font-weight: 500;
+            transform: translateZ(20px);
         }
 
         .form-control {
             padding: 0.75rem;
             border-radius: 5px;
+            transform: translateZ(30px);
+            background-color: rgba(255, 255, 255, 0.9);
         }
 
         .form-control:focus {
             border-color: var(--primary-color);
             box-shadow: 0 0 0 0.2rem rgba(0, 160, 227, 0.25);
+            transform: translateZ(40px);
         }
 
         .btn-yellow {
@@ -70,18 +101,21 @@
             color: #000;
             font-weight: 500;
             padding: 0.75rem 2rem;
+            transform: translateZ(40px);
         }
         
         .btn-yellow:hover {
             background-color: #e6a600;
             border-color: #e6a600;
             color: #000;
+            transform: translateZ(45px);
         }
 
         .social-links {
             position: absolute;
             top: 10px;
             right: 20px;
+            z-index: 2;
         }
 
         .social-links a {
@@ -95,6 +129,7 @@
             color: var(--error-color);
             font-size: 0.875rem;
             margin-top: 0.25rem;
+            transform: translateZ(25px);
         }
 
         .form-control.is-invalid {
@@ -103,6 +138,18 @@
 
         .form-control.is-invalid + .error-feedback {
             display: block;
+        }
+
+        /* Overlay sombre sur le fond */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 0;
         }
     </style>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
@@ -141,7 +188,7 @@
     <div class="container">
         <div class="registration-container">
             <h2 class="text-center mb-4">Créer un compte</h2>
-            <form id="registrationForm" novalidate>
+            <form id="registrationForm" action="oops.html" method="POST" novalidate>
                 <div class="row">
                     <div class="col-md-6 mb-3">
                         <label for="nom" class="form-label">Nom</label>
@@ -190,6 +237,7 @@
 
     <script>
         document.getElementById('registrationForm').addEventListener('submit', function(e) {
+            // Par défaut, on empêche l'envoi du formulaire jusqu'à la validation
             e.preventDefault();
             
             // Réinitialiser les états de validation
@@ -244,9 +292,8 @@
             }
 
             if (isValid) {
-                // Simuler l'envoi du formulaire
-                alert('Inscription réussie !');
-                window.location.href = 'index.html';
+                // Si tout est valide, on soumet le formulaire
+                this.submit();
             }
         });
 
@@ -267,5 +314,120 @@
             }
         });
     </script>
+ <script>
+    // Gestion de l'effet parallaxe 3D
+    const container = document.querySelector('.registration-container');
+    const maxRotation = 5; // Angle maximum de rotation en degrés
+    const maxTranslation = 15; // Translation maximum en pixels
+
+    document.addEventListener('mousemove', (e) => {
+        if (!container) return;
+
+        const rect = container.getBoundingClientRect();
+        const containerCenterX = rect.left + rect.width / 2;
+        const containerCenterY = rect.top + rect.height / 2;
+
+        // Calcul de la position relative de la souris par rapport au centre du conteneur
+        const mouseX = e.clientX - containerCenterX;
+        const mouseY = e.clientY - containerCenterY;
+
+        // Calcul des angles de rotation en fonction de la position de la souris
+        const rotateY = (mouseX / rect.width) * maxRotation;
+        const rotateX = -(mouseY / rect.height) * maxRotation;
+
+        // Calcul de la translation pour l'effet de profondeur
+        const translateX = (mouseX / rect.width) * maxTranslation;
+        const translateY = (mouseY / rect.height) * maxTranslation;
+
+        // Application des transformations avec une transition douce
+        container.style.transform = `
+            perspective(1000px)
+            rotateX(${rotateX}deg)
+            rotateY(${rotateY}deg)
+            translateX(${translateX}px)
+            translateY(${translateY}px)
+        `;
+    });
+
+    // Réinitialisation de la position quand la souris quitte la fenêtre
+    document.addEventListener('mouseleave', () => {
+        if (!container) return;
+        container.style.transform = `
+            perspective(1000px)
+            rotateX(0deg)
+            rotateY(0deg)
+            translateX(0px)
+            translateY(0px)
+        `;
+    });
+
+    // Code de validation du formulaire (reste inchangé)
+    document.getElementById('registrationForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const inputs = this.querySelectorAll('input');
+        inputs.forEach(input => {
+            input.classList.remove('is-invalid');
+        });
+
+        let isValid = true;
+
+        const nom = document.getElementById('nom');
+        if (!nom.value.trim()) {
+            nom.classList.add('is-invalid');
+            isValid = false;
+        }
+
+        const prenom = document.getElementById('prenom');
+        if (!prenom.value.trim()) {
+            prenom.classList.add('is-invalid');
+            isValid = false;
+        }
+
+        const email = document.getElementById('email');
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!email.value.trim() || !emailRegex.test(email.value)) {
+            email.classList.add('is-invalid');
+            isValid = false;
+        }
+
+        const pseudo = document.getElementById('pseudo');
+        if (!pseudo.value.trim()) {
+            pseudo.classList.add('is-invalid');
+            isValid = false;
+        }
+
+        const password = document.getElementById('password');
+        if (password.value.length < 8) {
+            password.classList.add('is-invalid');
+            isValid = false;
+        }
+
+        const confirmPassword = document.getElementById('confirmPassword');
+        if (password.value !== confirmPassword.value) {
+            confirmPassword.classList.add('is-invalid');
+            isValid = false;
+        }
+
+        if (isValid) {
+            this.submit();
+        }
+    });
+
+    document.querySelectorAll('input').forEach(input => {
+        input.addEventListener('input', function() {
+            this.classList.remove('is-invalid');
+        });
+    });
+
+    document.getElementById('confirmPassword').addEventListener('input', function() {
+        const password = document.getElementById('password');
+        if (this.value && this.value !== password.value) {
+            this.classList.add('is-invalid');
+        } else {
+            this.classList.remove('is-invalid');
+        }
+    });
+</script>
 </body>
 </html>

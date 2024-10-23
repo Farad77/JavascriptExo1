@@ -1,0 +1,25 @@
+<html>
+<body>
+   
+<p id="bidule"></p>
+<input type="texte" onkeyup="changeValeur();" id="txt" />
+<button id="btnHeure" onclick="cliquons(); " >OK</button>
+
+<script>
+    document.getElementById("bidule").innerHTML = "Hello World!";
+console.log(document);
+
+function cliquons(){
+    let valeurTexte=document.getElementById('txt').value;
+    document.getElementById('btnHeure').innerHTML=valeurTexte;
+    document.getElementById('txt').value="";
+}
+function changeValeur(){
+    let valeurTexte=document.getElementById('txt').value;
+    document.getElementById('btnHeure').innerHTML=valeurTexte;
+    
+}
+</script>
+
+</body>
+</html>
